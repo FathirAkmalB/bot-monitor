@@ -14,7 +14,7 @@ BOT_TOKEN = '8584105605:AAFUEN4VTmvfin7BUoPumI_Wzy5qWOnWkAE'
 CHANNELS_TO_WATCH = [-1001611324665, -1001525948158, '@basegamee', -1001928438462,'@Roblox_Fess', '@affectionadr']
 DATABASE_KEYWORDS = {
     1156428344: ["top up", "robux", "vilog", "500r", "80r", "1000r", "1kr"], # Ganti dengan ID kamu
-    8303077005: ["robux", "robuxx", "rxb", "500r", "1000r", "robux vilog", "vilog robux", "robux prem", "robak", "robuk", "robax", "kr", "1kr", "2kr", "free prem", "vilog", "free prem", "heartopia", "heart diamond", "diamond heart"
+    8303077005: ["bignom", "robux", "robuxx", "rxb", "500r", "1000r", "robux vilog", "vilog robux", "robux prem", "robak", "robuk", "robax", "kr", "1kr", "2kr", "free prem", "vilog", "free prem", "heartopia", "heart diamond", "diamond heart"
 ] # Ganti dengan ID kamu
 
 }
