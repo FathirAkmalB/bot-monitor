@@ -108,49 +108,57 @@ async def start_user_bot(user_id, bot_token):
 
 @userbot.on(events.NewMessage(chats=CHANNELS_TO_WATCH))
 async def monitoring(event):
+    try:
     # --- AMBIL METADATA (TAMBAHKAN INI) ---
-    chat = await event.get_chat()
-    chat_title = getattr(chat, 'title', 'Private Channel') # Nama Channel
-    sender = await event.get_sender()
-    sender_name = getattr(sender, 'first_name', 'Hidden User') # Nama Pengirim
-    waktu_wib = event.date.strftime('%H:%M:%S') # Format Jam:Menit:Detik
+        chat = await event.get_chat()
+        chat_title = getattr(chat, 'title', 'Private Channel') # Nama Channel
+        sender = await event.get_sender()
+        sender_name = getattr(sender, 'first_name', 'Hidden User') # Nama Pengirim
+        waktu_wib = event.date.strftime('%H:%M:%S') # Format Jam:Menit:Detik
 
-    pesan_raw = event.raw_text
-    pesan_lowered = pesan_raw.lower()
-    
-    conn = sqlite3.connect('monitorboy.db')
-    all_users = conn.execute("SELECT user_id, keywords FROM users").fetchall()
-    conn.close()
+        pesan_raw = event.raw_text
+        pesan_lowered = pesan_raw.lower()
+        
+        conn = sqlite3.connect('monitorboy.db')
+        all_users = conn.execute("SELECT user_id, keywords FROM users").fetchall()
+        conn.close()
 
-    for uid, kw_str in all_users:
-        keywords = [k.strip().lower() for k in kw_str.split(',') if k.strip()]
-        for kw in keywords:
-            if re.search(r'\b' + re.escape(kw) + r'\b', pesan_lowered):
-                bot_client = user_bot_instances.get(uid)
-                if bot_client:
-                    clean_id = str(event.chat_id).replace('-100', '')
-                    link = f"https://t.me/c/{clean_id}/{event.id}"
-                    
-                    # --- UPDATE BAGIAN INI ---
-                    text_notif = (
-                        f"🎯 **KEYWORD TERDETEKSI!**\n"
-                        f"━━━━━━━━━━━━━━━━━━━━\n"
-                        f"🔑 **Keyword:** `{kw.upper()}`\n"
-                        f"📢 **Channel:** `{chat_title}`\n"
-                        # f"👤 **Sender:** `{sender_name}`\n"
-                        f"⏰ **Waktu:** `{waktu_wib} WIB`\n"
-                        f"━━━━━━━━━━━━━━━━━━━━\n"
-                        f"📝 **Isi Pesan:**\n_{pesan_raw[:500]}_\n\n"
-                        f"🔗 [Klik untuk Lihat Pesan Full]({link})"
-                    )
-                    # --------------------------
-                    
-                    try:
-                        await bot_client.send_message(uid, text_notif, buttons=[Button.inline("🚀 Send Wording", f"sw|{event.chat_id}|{event.id}")])
-                        print(f"{CLR['YELLOW']}🎯 Hit!{CLR['END']} | User: {uid} | Key: {CLR['BOLD']}{kw}{CLR['END']}")
-                    except Exception as e:
-                        print(f"{CLR['RED']}⚠️ Notif Failed{CLR['END']} | User: {uid} | {e}")
-                break
+        for uid, kw_str in all_users:
+            keywords = [k.strip().lower() for k in kw_str.split(',') if k.strip()]
+            for kw in keywords:
+                if re.search(r'\b' + re.escape(kw) + r'\b', pesan_lowered):
+                    bot_client = user_bot_instances.get(uid)
+                    if bot_client:
+                        clean_id = str(event.chat_id).replace('-100', '')
+                        link = f"https://t.me/c/{clean_id}/{event.id}"
+                        
+                        # --- UPDATE BAGIAN INI ---
+                        text_notif = (
+                            f"🎯 **KEYWORD TERDETEKSI!**\n"
+                            f"━━━━━━━━━━━━━━━━━━━━\n"
+                            f"🔑 **Keyword:** `{kw.upper()}`\n"
+                            f"📢 **Channel:** `{chat_title}`\n"
+                            # f"👤 **Sender:** `{sender_name}`\n"
+                            f"⏰ **Waktu:** `{waktu_wib} WIB`\n"
+                            f"━━━━━━━━━━━━━━━━━━━━\n"
+                            f"📝 **Isi Pesan:**\n_{pesan_raw[:500]}_\n\n"
+                            f"🔗 [Klik untuk Lihat Pesan Full]({link})"
+                        )
+                        # --------------------------
+                        
+                        try:
+                            await bot_client.send_message(uid, text_notif, buttons=[Button.inline("🚀 Send Wording", f"sw|{event.chat_id}|{event.id}")])
+                            print(f"{CLR['YELLOW']}🎯 Hit!{CLR['END']} | User: {uid} | Key: {CLR['BOLD']}{kw}{CLR['END']}")
+                        except Exception as e:
+                            print(f"{CLR['RED']}⚠️ Notif Failed{CLR['END']} | User: {uid} | {e}")
+                    break
+    except Exception as e:
+        # Ini supaya kalau ada constructor error di satu channel, bot nggak mati total
+        if "Constructor ID" in str(e):
+            print(f"{CLR['YELLOW']}⚠️ Telegram Update Detected: Silakan update telethon & hapus session.{CLR['END']}")
+        else:
+            print(f"{CLR['RED']}⚠️ Monitoring Error:{CLR['END']} {e}")
+   
 
 # --- ALUR REGISTRASI (MAIN BOT) ---
 
